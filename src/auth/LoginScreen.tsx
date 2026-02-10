@@ -3,6 +3,8 @@ import { useAuth } from './AuthProvider'
 
 type Mode = 'sign-in' | 'sign-up'
 
+const SIGNUP_ENABLED = import.meta.env.VITE_ENABLE_SIGNUP === 'true'
+
 export function LoginScreen() {
   const { signInWithEmailPassword, signUpWithEmailPassword, signInWithGoogle, isLoading } =
     useAuth()
@@ -143,16 +145,18 @@ export function LoginScreen() {
             [CONTINUE WITH GOOGLE]
           </button>
 
-          <button
-            className="mt-5 w-full text-center font-body text-xs text-gray-600 transition hover:text-retro-cyan disabled:cursor-not-allowed disabled:opacity-60"
-            type="button"
-            onClick={() => setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')}
-            disabled={isDisabled}
-          >
-            {mode === 'sign-in'
-              ? "Don't have an account? Sign up"
-              : 'Already have an account? Sign in'}
-          </button>
+          {SIGNUP_ENABLED && (
+            <button
+              className="mt-5 w-full text-center font-body text-xs text-gray-600 transition hover:text-retro-cyan disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              onClick={() => setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')}
+              disabled={isDisabled}
+            >
+              {mode === 'sign-in'
+                ? "Don't have an account? Sign up"
+                : 'Already have an account? Sign in'}
+            </button>
+          )}
           </>)}
         </div>
       </div>
