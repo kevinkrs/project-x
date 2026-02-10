@@ -8,6 +8,7 @@ type UseNotesResult = {
   isLoading: boolean
   error: string | null
   createNote: (input: { structured_transcript: string; durationSeconds: number; title?: string }) => Promise<void>
+  deleteNote: (id: string) => Promise<void>
 }
 
 export function useNotes(userId: string | undefined): UseNotesResult {
@@ -114,5 +115,25 @@ export function useNotes(userId: string | undefined): UseNotesResult {
     [userId],
   )
 
-  return { notes, isLoading, error, createNote }
+  const deleteNote = useCallback(
+    async (id: string) => {
+      if (!userId) return
+
+      const { error: deleteError } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId)
+
+      if (deleteError) {
+        console.error('Error deleting note', deleteError)
+        throw deleteError
+      }
+
+      setNotes((prev) => prev.filter((n) => n.id !== id))
+    },
+    [userId],
+  )
+
+  return { notes, isLoading, error, createNote, deleteNote }
 }

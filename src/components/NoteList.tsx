@@ -8,9 +8,10 @@ type NoteListProps = {
   notes: Note[]
   isLoading: boolean
   error: string | null
+  onDeleteNote?: (id: string) => void
 }
 
-export function NoteList({ notes, isLoading, error }: NoteListProps) {
+export function NoteList({ notes, isLoading, error, onDeleteNote }: NoteListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
 
@@ -63,6 +64,7 @@ export function NoteList({ notes, isLoading, error }: NoteListProps) {
           onToggle={() =>
             setExpandedId((current) => (current === note.id ? null : note.id))
           }
+          onDelete={onDeleteNote}
         />
       ))}
 

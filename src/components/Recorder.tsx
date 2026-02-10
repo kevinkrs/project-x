@@ -9,7 +9,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const { status, durationSeconds, error, start, stop } = useRecorder({
+  const { status, durationSeconds, error, start, stop, discard } = useRecorder({
     onFinished: async (result) => {
       try {
         setIsSubmitting(true)
@@ -71,14 +71,25 @@ export function Recorder({ onCreateNote }: RecorderProps) {
 
         <div className="flex items-center gap-2">
           {isRecording ? (
-            <button
-              type="button"
-              onClick={() => stop()}
-              className="pixel-btn rounded-none border-2 border-retro-red bg-retro-red/10 px-4 py-2 font-pixel text-[8px] text-retro-red shadow-[4px_4px_0px_0px_rgba(255,7,58,0.3)] transition hover:bg-retro-red/20 disabled:cursor-not-allowed disabled:opacity-60 sm:text-[10px]"
-              disabled={isProcessing}
-            >
-              [STOP]
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => discard()}
+                className="flex h-7 w-7 items-center justify-center rounded-none border border-gray-600 text-gray-500 transition hover:border-gray-400 hover:text-gray-300 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={isProcessing}
+                title="Discard recording"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => stop()}
+                className="pixel-btn rounded-none border-2 border-retro-red bg-retro-red/10 px-4 py-2 font-pixel text-[8px] text-retro-red shadow-[4px_4px_0px_0px_rgba(255,7,58,0.3)] transition hover:bg-retro-red/20 disabled:cursor-not-allowed disabled:opacity-60 sm:text-[10px]"
+                disabled={isProcessing}
+              >
+                [STOP]
+              </button>
+            </>
           ) : (
             <button
               type="button"

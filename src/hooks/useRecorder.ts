@@ -22,6 +22,7 @@ export function useRecorder(options: UseRecorderOptions = {}) {
   const startTimeRef = useRef<number | null>(null)
   const timerRef = useRef<number | null>(null)
   const chunksRef = useRef<Blob[]>([])
+  const discardingRef = useRef(false)
   const onFinishedRef = useRef(onFinished)
   onFinishedRef.current = onFinished
 
@@ -60,6 +61,9 @@ export function useRecorder(options: UseRecorderOptions = {}) {
       }
 
       mediaRecorder.onstop = async () => {
+        const wasDiscarded = discardingRef.current
+        discardingRef.current = false
+
         const elapsed = startTimeRef.current
           ? (performance.now() - startTimeRef.current) / 1000
           : 0
@@ -67,6 +71,12 @@ export function useRecorder(options: UseRecorderOptions = {}) {
 
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' })
         chunksRef.current = []
+
+        if (wasDiscarded) {
+          setStatus('idle')
+          reset()
+          return
+        }
 
         setDurationSeconds(elapsed)
 
@@ -109,6 +119,19 @@ export function useRecorder(options: UseRecorderOptions = {}) {
     }
   }, [status])
 
+  const discard = useCallback(() => {
+    if (status !== 'recording') return
+
+    discardingRef.current = true
+    stopTimer()
+
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop()
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop())
+      mediaRecorderRef.current = null
+    }
+  }, [status])
+
   useEffect(() => {
     return () => {
       stopTimer()
@@ -125,6 +148,7 @@ export function useRecorder(options: UseRecorderOptions = {}) {
     error,
     start,
     stop,
+    discard,
   }
 }
 

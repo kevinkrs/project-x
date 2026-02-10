@@ -2,7 +2,7 @@ import { AuthProvider, useAuth } from './auth/AuthProvider'
 import { LoginScreen } from './auth/LoginScreen'
 import { Recorder } from './components/Recorder'
 import { NoteList } from './components/NoteList'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { useNotes } from './hooks/useNotes'
 import { processAudioNote } from './services/gemini/client'
 import type { Note } from './types/note'
@@ -13,14 +13,8 @@ function ProfileSection() {
   const email = user?.email ?? ''
   const displayName = email ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1) : ''
   const seedKey = `avatar-seed-${user?.id ?? 'anon'}`
-  const [avatarSeed, setAvatarSeed] = useState(() => localStorage.getItem(seedKey) ?? email)
+  const avatarSeed = localStorage.getItem(seedKey) ?? email
   const avatarUrl = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${encodeURIComponent(avatarSeed)}&backgroundColor=1e1e1e`
-
-  function regenerateAvatar() {
-    const newSeed = crypto.randomUUID()
-    localStorage.setItem(seedKey, newSeed)
-    setAvatarSeed(newSeed)
-  }
 
   return (
     <section className="pixel-border relative overflow-hidden rounded-none bg-retro-dark p-5 scanlines">
@@ -28,9 +22,7 @@ function ProfileSection() {
         <img
           src={avatarUrl}
           alt={`${displayName}'s avatar`}
-          className="pixel-avatar h-12 w-12 cursor-pointer rounded-none bg-retro-black transition hover:opacity-80"
-          onClick={regenerateAvatar}
-          title="Click to regenerate avatar"
+          className="pixel-avatar h-16 w-16 rounded-none bg-retro-black"
         />
         <div className="flex-1 space-y-2">
           <h1 className="font-pixel text-sm text-retro-cyan sm:text-base">
@@ -82,7 +74,7 @@ function SummarySection({ notes }: { notes: Note[] }) {
 
 function AppShell() {
   const { user, isLoading, signOut } = useAuth()
-  const { notes, isLoading: isLoadingNotes, error: notesError, createNote } = useNotes(user?.id)
+  const { notes, isLoading: isLoadingNotes, error: notesError, createNote, deleteNote } = useNotes(user?.id)
 
   const handleRecordingFinished = useCallback(
     async (result: RecorderResult) => {
@@ -146,7 +138,7 @@ function AppShell() {
                 </span>
               </div>
 
-              <NoteList notes={notes} isLoading={isLoadingNotes} error={notesError} />
+              <NoteList notes={notes} isLoading={isLoadingNotes} error={notesError} onDeleteNote={deleteNote} />
             </div>
           </div>
         )}
