@@ -10,7 +10,7 @@ CREATE TABLE notes (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title       TEXT,
-  transcript  TEXT NOT NULL,
+  structured_transcript TEXT NOT NULL,
   duration_seconds INTEGER NOT NULL DEFAULT 0,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

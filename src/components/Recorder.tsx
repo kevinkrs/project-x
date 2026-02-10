@@ -9,7 +9,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const { status, transcript, durationSeconds, error, start, stop } = useRecorder({
+  const { status, durationSeconds, error, start, stop } = useRecorder({
     onFinished: async (result) => {
       try {
         setIsSubmitting(true)
@@ -28,7 +28,6 @@ export function Recorder({ onCreateNote }: RecorderProps) {
   const isRecording = status === 'recording'
   const isProcessing = status === 'processing' || isSubmitting
 
-  const hasTranscript = transcript.trim().length > 0
   const formattedDuration =
     durationSeconds > 0
       ? new Date(durationSeconds * 1000).toISOString().substring(14, 19)
@@ -93,7 +92,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
         </div>
       </div>
 
-      {(error || submitError || hasTranscript || isRecording) && (
+      {(error || submitError || isRecording) && (
         <div className="mt-3 rounded-none border border-retro-cyan/10 bg-retro-black/60 p-3">
           {error && (
             <p className="font-pixel text-[8px] text-retro-red">{'>>'} {error}</p>
@@ -101,12 +100,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
           {submitError && (
             <p className="font-pixel text-[8px] text-retro-red">{'>>'} {submitError}</p>
           )}
-          {hasTranscript && !error && (
-            <p className="font-body text-xs text-gray-400 line-clamp-3">
-              {transcript.trim()}
-            </p>
-          )}
-          {!hasTranscript && !error && isRecording && (
+          {!error && isRecording && (
             <p className="font-body text-[10px] text-gray-600">
               Listening for your note<span className="retro-blink">_</span>
             </p>

@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown'
 import type { Note } from '../types/note'
 
 type NoteCardProps = {
@@ -26,7 +27,7 @@ function formatDuration(seconds: number) {
 
 function deriveTitle(note: Note) {
   if (note.title && note.title.trim().length > 0) return note.title.trim()
-  const trimmed = note.transcript.trim()
+  const trimmed = note.structured_transcript.trim()
   if (!trimmed) {
     return 'Untitled note'
   }
@@ -66,9 +67,9 @@ export function NoteCard({ note, isExpanded, onToggle }: NoteCardProps) {
 
       {isExpanded && (
         <div className="border-t border-retro-cyan/10 px-4 pb-4 pt-3">
-          <p className="font-body text-xs leading-relaxed text-gray-300 whitespace-pre-wrap">
-            {note.transcript || 'No transcript available for this note.'}
-          </p>
+          <div className="font-body text-xs leading-relaxed text-gray-300 prose prose-invert prose-sm max-w-none">
+            <ReactMarkdown>{note.structured_transcript || 'No transcript available for this note.'}</ReactMarkdown>
+          </div>
         </div>
       )}
     </article>

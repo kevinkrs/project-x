@@ -22,6 +22,7 @@ export function LoginScreen() {
         await signInWithEmailPassword(email, password)
       } else {
         await signUpWithEmailPassword(email, password)
+        setCheckEmail(true)
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
@@ -49,6 +50,23 @@ export function LoginScreen() {
     <div className="flex items-center justify-center min-h-[calc(100vh-5rem)] px-4 pb-10">
       <div className="relative w-full max-w-md pixel-border rounded-none bg-retro-dark p-6 scanlines">
         <div className="relative z-10">
+          {checkEmail ? (
+            <div className="py-4 text-center space-y-4">
+              <h1 className="font-pixel text-base text-retro-green sm:text-lg">
+                {'>'} Check your email
+              </h1>
+              <p className="font-body text-sm text-gray-400">
+                We sent a confirmation link to <span className="text-retro-cyan">{email}</span>. Click it to activate your account.
+              </p>
+              <button
+                type="button"
+                onClick={() => { setCheckEmail(false); setMode('sign-in') }}
+                className="mt-2 font-pixel text-[8px] text-gray-600 transition hover:text-retro-cyan"
+              >
+                {'<< back to sign in'}
+              </button>
+            </div>
+          ) : (<>
           <h1 className="mb-1 font-pixel text-base text-retro-cyan sm:text-lg">
             {'>'} Welcome
           </h1>
@@ -135,6 +153,7 @@ export function LoginScreen() {
               ? "Don't have an account? Sign up"
               : 'Already have an account? Sign in'}
           </button>
+          </>)}
         </div>
       </div>
     </div>

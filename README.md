@@ -73,3 +73,14 @@ export default defineConfig([
   },
 ])
 ```
+
+# Supabase
+
+## Edge-functions
+
+You can deploy edge functions such as the LLM API call. To do so you should set all envs via
+`supabase secrets set MY_ENV="VALUE"`
+
+and then you can add new functions within the `functions` directory and deploy those with
+`supabase functions deploy <directory name>`
+the function directory should only contain an `index.ts` file.

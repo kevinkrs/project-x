@@ -2,22 +2,35 @@ import { AuthProvider, useAuth } from './auth/AuthProvider'
 import { LoginScreen } from './auth/LoginScreen'
 import { Recorder } from './components/Recorder'
 import { NoteList } from './components/NoteList'
-import { SAMPLE_USER } from './data/sampleNotes'
+import { useCallback, useState } from 'react'
 import { useNotes } from './hooks/useNotes'
+import { processAudioNote } from './services/gemini/client'
 import type { Note } from './types/note'
+import type { RecorderResult } from './hooks/useRecorder'
 
 function ProfileSection() {
-  const { user, signOut } = useAuth()
-  const displayName = SAMPLE_USER.name
-  const email = user?.email ?? SAMPLE_USER.email
+  const { user } = useAuth()
+  const email = user?.email ?? ''
+  const displayName = email ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1) : ''
+  const seedKey = `avatar-seed-${user?.id ?? 'anon'}`
+  const [avatarSeed, setAvatarSeed] = useState(() => localStorage.getItem(seedKey) ?? email)
+  const avatarUrl = `https://api.dicebear.com/9.x/pixel-art/svg?seed=${encodeURIComponent(avatarSeed)}&backgroundColor=1e1e1e`
+
+  function regenerateAvatar() {
+    const newSeed = crypto.randomUUID()
+    localStorage.setItem(seedKey, newSeed)
+    setAvatarSeed(newSeed)
+  }
 
   return (
     <section className="pixel-border relative overflow-hidden rounded-none bg-retro-dark p-5 scanlines">
       <div className="relative z-10 flex items-center gap-5">
         <img
-          src={SAMPLE_USER.avatarUrl}
+          src={avatarUrl}
           alt={`${displayName}'s avatar`}
-          className="pixel-avatar h-20 w-20 rounded-none bg-retro-black"
+          className="pixel-avatar h-12 w-12 cursor-pointer rounded-none bg-retro-black transition hover:opacity-80"
+          onClick={regenerateAvatar}
+          title="Click to regenerate avatar"
         />
         <div className="flex-1 space-y-2">
           <h1 className="font-pixel text-sm text-retro-cyan sm:text-base">
@@ -31,13 +44,6 @@ function ProfileSection() {
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="pixel-btn pixel-border-magenta rounded-none bg-retro-dark px-3 py-2 font-pixel text-[8px] text-retro-magenta transition hover:bg-retro-magenta/10 sm:text-[10px]"
-        >
-          Log out
-        </button>
       </div>
     </section>
   )
@@ -75,8 +81,25 @@ function SummarySection({ notes }: { notes: Note[] }) {
 }
 
 function AppShell() {
-  const { user, isLoading } = useAuth()
+  const { user, isLoading, signOut } = useAuth()
   const { notes, isLoading: isLoadingNotes, error: notesError, createNote } = useNotes(user?.id)
+
+  const handleRecordingFinished = useCallback(
+    async (result: RecorderResult) => {
+      if (result.audioBlob.size === 0) {
+        throw new Error('No audio was recorded.')
+      }
+
+      const geminiResponse = await processAudioNote({ audioBlob: result.audioBlob })
+
+      await createNote({
+        structured_transcript: geminiResponse.structured_transcript,
+        durationSeconds: result.durationSeconds,
+        title: geminiResponse.title,
+      })
+    },
+    [createNote],
+  )
 
   return (
     <div className="min-h-screen bg-retro-black font-body text-gray-200">
@@ -108,7 +131,7 @@ function AppShell() {
             <div className="space-y-4 lg:sticky lg:top-4 lg:w-80 lg:shrink-0">
               <ProfileSection />
               <SummarySection notes={notes} />
-              <Recorder onCreateNote={createNote} />
+              <Recorder onCreateNote={handleRecordingFinished} />
             </div>
 
             {/* Right column: notes list */}
@@ -134,6 +157,15 @@ function AppShell() {
         <p className="font-pixel text-[8px] text-gray-700">
           {'<<'} built with pixels and caffeine {'>>'}
         </p>
+        {user && (
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="pixel-btn pixel-border-magenta mt-3 rounded-none bg-retro-dark px-3 py-2 font-pixel text-[8px] text-retro-magenta transition hover:bg-retro-magenta/10 sm:text-[10px]"
+          >
+            Log out
+          </button>
+        )}
       </footer>
     </div>
   )

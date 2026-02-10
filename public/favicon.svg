@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="4" fill="#0a0a0a"/>
+  <!-- Pixel "X" in retro cyan/magenta -->
+  <g fill="#00fff5">
+    <rect x="6" y="6" width="4" height="4"/>
+    <rect x="22" y="6" width="4" height="4"/>
+    <rect x="10" y="10" width="4" height="4"/>
+    <rect x="18" y="10" width="4" height="4"/>
+    <rect x="14" y="14" width="4" height="4"/>
+    <rect x="10" y="18" width="4" height="4"/>
+    <rect x="18" y="18" width="4" height="4"/>
+    <rect x="6" y="22" width="4" height="4"/>
+    <rect x="22" y="22" width="4" height="4"/>
+  </g>
+  <!-- Glow accents -->
+  <rect x="14" y="14" width="4" height="4" fill="#ff00e4" opacity="0.6"/>
+  <rect x="6" y="6" width="4" height="4" fill="#ff00e4" opacity="0.2"/>
+  <rect x="22" y="22" width="4" height="4" fill="#ff00e4" opacity="0.2"/>
+</svg>

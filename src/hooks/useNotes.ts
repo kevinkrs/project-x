@@ -7,7 +7,7 @@ type UseNotesResult = {
   notes: Note[]
   isLoading: boolean
   error: string | null
-  createNote: (input: { transcript: string; durationSeconds: number }) => Promise<void>
+  createNote: (input: { structured_transcript: string; durationSeconds: number; title?: string }) => Promise<void>
 }
 
 export function useNotes(userId: string | undefined): UseNotesResult {
@@ -83,15 +83,19 @@ export function useNotes(userId: string | undefined): UseNotesResult {
   }, [userId])
 
   const createNote = useCallback(
-    async (input: { transcript: string; durationSeconds: number }) => {
+    async (input: { structured_transcript: string; durationSeconds: number; title?: string }) => {
       if (!userId) {
         return
       }
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         user_id: userId,
-        transcript: input.transcript.trim(),
+        structured_transcript: input.structured_transcript.trim(),
         duration_seconds: Math.max(0, Math.round(input.durationSeconds)),
+      }
+
+      if (input.title) {
+        payload.title = input.title
       }
 
       const { data, error: insertError } = await supabase
