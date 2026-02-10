@@ -34,7 +34,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
       : '00:00'
 
   return (
-    <section className={`relative rounded-none bg-retro-dark p-4 ${isRecording ? 'pixel-border-magenta recording-pulse' : 'pixel-border-green'}`}>
+    <section className={`relative rounded-none bg-retro-dark p-4 ${isRecording ? 'pixel-border-magenta recording-pulse' : isProcessing ? 'pixel-border-blue processing-pulse' : 'pixel-border-green'}`}>
       <header className="mb-3 flex items-center justify-between gap-2">
         <div className="space-y-1">
           <h2 className="font-pixel text-[10px] text-retro-green sm:text-xs">
@@ -52,7 +52,9 @@ export function Recorder({ onCreateNote }: RecorderProps) {
             className={`inline-flex h-3 w-3 items-center justify-center ${
               isRecording
                 ? 'bg-retro-red shadow-[0_0_12px_rgba(255,7,58,0.9)]'
-                : 'bg-gray-700'
+                : isProcessing
+                  ? 'bg-[#4488ff] shadow-[0_0_12px_rgba(68,136,255,0.9)]'
+                  : 'bg-gray-700'
             }`}
           />
           <div className="flex flex-col">
@@ -69,7 +71,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           {isRecording ? (
             <>
               <button
@@ -94,7 +96,7 @@ export function Recorder({ onCreateNote }: RecorderProps) {
             <button
               type="button"
               onClick={() => void start()}
-              className="pixel-btn rounded-none border-2 border-retro-green bg-retro-green/10 px-4 py-2 font-pixel text-[8px] text-retro-green shadow-[4px_4px_0px_0px_rgba(57,255,20,0.3)] transition hover:bg-retro-green/20 disabled:cursor-not-allowed disabled:opacity-60 sm:text-[10px]"
+              className="pixel-btn rounded-none border-2 border-retro-green bg-retro-green/10 px-5 py-3 font-pixel text-[10px] text-retro-green shadow-[4px_4px_0px_0px_rgba(57,255,20,0.3)] transition hover:bg-retro-green/20 disabled:cursor-not-allowed disabled:opacity-60 sm:px-4 sm:py-2 sm:text-[10px]"
               disabled={isProcessing}
             >
               [REC]
